@@ -5,80 +5,80 @@
 // =============================================================================
 
 // ---------------------------------------------------------------------------
-// TEAMS
+// TEAMS — Sorteo oficial FIFA World Cup 2026
 // ---------------------------------------------------------------------------
 const TEAMS = [
   // GRUPO A
-  { id: 'USA',     name: 'Estados Unidos',  group: 'A', flag: '🇺🇸', color: '#B22234' },
-  { id: 'MEX',     name: 'México',          group: 'A', flag: '🇲🇽', color: '#006847' },
-  { id: 'CAN',     name: 'Canadá',          group: 'A', flag: '🇨🇦', color: '#FF0000' },
-  { id: 'PAN',     name: 'Panamá',          group: 'A', flag: '🇵🇦', color: '#D21034' },
+  { id: 'MEX',  name: 'México',          group: 'A', flag: '🇲🇽', color: '#006847' },
+  { id: 'KOR',  name: 'Corea del Sur',   group: 'A', flag: '🇰🇷', color: '#CD2E3A' },
+  { id: 'RSA',  name: 'Sudáfrica',       group: 'A', flag: '🇿🇦', color: '#007A4D' },
+  { id: 'CZE',  name: 'Rep. Checa',      group: 'A', flag: '🇨🇿', color: '#D7141A' },
 
   // GRUPO B
-  { id: 'ARG',     name: 'Argentina',       group: 'B', flag: '🇦🇷', color: '#75AADB' },
-  { id: 'CHI',     name: 'Chile',           group: 'B', flag: '🇨🇱', color: '#D52B1E' },
-  { id: 'MAR',     name: 'Marruecos',       group: 'B', flag: '🇲🇦', color: '#C1272D' },
-  { id: 'IVK',     name: 'Costa de Marfil', group: 'B', flag: '🇨🇮', color: '#F77F00' },
+  { id: 'CAN',  name: 'Canadá',          group: 'B', flag: '🇨🇦', color: '#FF0000' },
+  { id: 'SUI',  name: 'Suiza',           group: 'B', flag: '🇨🇭', color: '#D52B1E' },
+  { id: 'QAT',  name: 'Catar',           group: 'B', flag: '🇶🇦', color: '#8D1B3D' },
+  { id: 'ITA',  name: 'Italia',          group: 'B', flag: '🇮🇹', color: '#009246' },
 
   // GRUPO C
-  { id: 'ENG',     name: 'Inglaterra',      group: 'C', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', color: '#CF081F' },
-  { id: 'SEN',     name: 'Senegal',         group: 'C', flag: '🇸🇳', color: '#00853F' },
-  { id: 'AUS',     name: 'Australia',       group: 'C', flag: '🇦🇺', color: '#FFCD00' },
-  { id: 'ALG',     name: 'Argelia',         group: 'C', flag: '🇩🇿', color: '#006233' },
+  { id: 'BRA',  name: 'Brasil',          group: 'C', flag: '🇧🇷', color: '#009C3B' },
+  { id: 'MAR',  name: 'Marruecos',       group: 'C', flag: '🇲🇦', color: '#C1272D' },
+  { id: 'SCO',  name: 'Escocia',         group: 'C', flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', color: '#003366' },
+  { id: 'HAI',  name: 'Haití',           group: 'C', flag: '🇭🇹', color: '#00209F' },
 
   // GRUPO D
-  { id: 'FRA',     name: 'Francia',         group: 'D', flag: '🇫🇷', color: '#002395' },
-  { id: 'TUN',     name: 'Túnez',           group: 'D', flag: '🇹🇳', color: '#E70013' },
-  { id: 'COL',     name: 'Colombia',        group: 'D', flag: '🇨🇴', color: '#FCD116' },
-  { id: 'NOR',     name: 'Noruega',         group: 'D', flag: '🇳🇴', color: '#EF2B2D' },
+  { id: 'USA',  name: 'Estados Unidos',  group: 'D', flag: '🇺🇸', color: '#B22234' },
+  { id: 'AUS',  name: 'Australia',       group: 'D', flag: '🇦🇺', color: '#FFCD00' },
+  { id: 'PAR',  name: 'Paraguay',        group: 'D', flag: '🇵🇾', color: '#D52B1E' },
+  { id: 'TUR',  name: 'Turquía',         group: 'D', flag: '🇹🇷', color: '#E30A17' },
 
   // GRUPO E
-  { id: 'BRA',     name: 'Brasil',          group: 'E', flag: '🇧🇷', color: '#009C3B' },
-  { id: 'PAR',     name: 'Paraguay',        group: 'E', flag: '🇵🇾', color: '#D52B1E' },
-  { id: 'JPN',     name: 'Japón',           group: 'E', flag: '🇯🇵', color: '#BC002D' },
-  { id: 'GHA',     name: 'Ghana',           group: 'E', flag: '🇬🇭', color: '#006B3F' },
+  { id: 'GER',  name: 'Alemania',        group: 'E', flag: '🇩🇪', color: '#000000' },
+  { id: 'ECU',  name: 'Ecuador',         group: 'E', flag: '🇪🇨', color: '#FFD100' },
+  { id: 'IVK',  name: 'Costa de Marfil', group: 'E', flag: '🇨🇮', color: '#F77F00' },
+  { id: 'CUW',  name: 'Curazao',         group: 'E', flag: '🇨🇼', color: '#002B7F' },
 
   // GRUPO F
-  { id: 'ESP',     name: 'España',          group: 'F', flag: '🇪🇸', color: '#AA151B' },
-  { id: 'URU',     name: 'Uruguay',         group: 'F', flag: '🇺🇾', color: '#75AADB' },
-  { id: 'NGA',     name: 'Nigeria',         group: 'F', flag: '🇳🇬', color: '#008751' },
-  { id: 'THA',     name: 'Tailandia',       group: 'F', flag: '🇹🇭', color: '#A51931' },
+  { id: 'NED',  name: 'Países Bajos',    group: 'F', flag: '🇳🇱', color: '#FF6600' },
+  { id: 'JPN',  name: 'Japón',           group: 'F', flag: '🇯🇵', color: '#BC002D' },
+  { id: 'TUN',  name: 'Túnez',           group: 'F', flag: '🇹🇳', color: '#E70013' },
+  { id: 'UKR',  name: 'Ucrania',         group: 'F', flag: '🇺🇦', color: '#005BBB' },
 
   // GRUPO G
-  { id: 'GER',     name: 'Alemania',        group: 'G', flag: '🇩🇪', color: '#000000' },
-  { id: 'SRB',     name: 'Serbia',          group: 'G', flag: '🇷🇸', color: '#C6363C' },
-  { id: 'CRI',     name: 'Costa Rica',      group: 'G', flag: '🇨🇷', color: '#002B7F' },
-  { id: 'NZL',     name: 'Nueva Zelanda',   group: 'G', flag: '🇳🇿', color: '#00247D' },
+  { id: 'BEL',  name: 'Bélgica',         group: 'G', flag: '🇧🇪', color: '#EF3340' },
+  { id: 'IRN',  name: 'Irán',            group: 'G', flag: '🇮🇷', color: '#239F40' },
+  { id: 'EGY',  name: 'Egipto',          group: 'G', flag: '🇪🇬', color: '#CE1126' },
+  { id: 'NZL',  name: 'Nueva Zelanda',   group: 'G', flag: '🇳🇿', color: '#00247D' },
 
   // GRUPO H
-  { id: 'POR',     name: 'Portugal',        group: 'H', flag: '🇵🇹', color: '#006600' },
-  { id: 'TUR',     name: 'Turquía',         group: 'H', flag: '🇹🇷', color: '#E30A17' },
-  { id: 'ECU',     name: 'Ecuador',         group: 'H', flag: '🇪🇨', color: '#FFD100' },
-  { id: 'RDC',     name: 'R. D. Congo',     group: 'H', flag: '🇨🇩', color: '#007FFF' },
+  { id: 'ESP',  name: 'España',          group: 'H', flag: '🇪🇸', color: '#AA151B' },
+  { id: 'URU',  name: 'Uruguay',         group: 'H', flag: '🇺🇾', color: '#75AADB' },
+  { id: 'KSA',  name: 'Arabia Saudí',    group: 'H', flag: '🇸🇦', color: '#006C35' },
+  { id: 'CPV',  name: 'Cabo Verde',      group: 'H', flag: '🇨🇻', color: '#003893' },
 
   // GRUPO I
-  { id: 'NED',     name: 'Países Bajos',    group: 'I', flag: '🇳🇱', color: '#FF6600' },
-  { id: 'GRE',     name: 'Grecia',          group: 'I', flag: '🇬🇷', color: '#0D5EAF' },
-  { id: 'EGY',     name: 'Egipto',          group: 'I', flag: '🇪🇬', color: '#CE1126' },
-  { id: 'BOL',     name: 'Bolivia',         group: 'I', flag: '🇧🇴', color: '#D52B1E' },
+  { id: 'FRA',  name: 'Francia',         group: 'I', flag: '🇫🇷', color: '#002395' },
+  { id: 'SEN',  name: 'Senegal',         group: 'I', flag: '🇸🇳', color: '#00853F' },
+  { id: 'NOR',  name: 'Noruega',         group: 'I', flag: '🇳🇴', color: '#EF2B2D' },
+  { id: 'IRQ',  name: 'Iraq',            group: 'I', flag: '🇮🇶', color: '#007A3D' },
 
   // GRUPO J
-  { id: 'BEL',     name: 'Bélgica',         group: 'J', flag: '🇧🇪', color: '#EF3340' },
-  { id: 'UKR',     name: 'Ucrania',         group: 'J', flag: '🇺🇦', color: '#005BBB' },
-  { id: 'MEQ',     name: 'México (alt.)',   group: 'J', flag: '🇲🇽', color: '#006847' }, // placeholder equipo CAF
-  { id: 'VEN',     name: 'Venezuela',       group: 'J', flag: '🇻🇪', color: '#CF142B' },
+  { id: 'ARG',  name: 'Argentina',       group: 'J', flag: '🇦🇷', color: '#75AADB' },
+  { id: 'AUT',  name: 'Austria',         group: 'J', flag: '🇦🇹', color: '#ED2939' },
+  { id: 'ALG',  name: 'Argelia',         group: 'J', flag: '🇩🇿', color: '#006233' },
+  { id: 'JOR',  name: 'Jordania',        group: 'J', flag: '🇯🇴', color: '#007A3D' },
 
   // GRUPO K
-  { id: 'KOR',     name: 'Corea del Sur',   group: 'K', flag: '🇰🇷', color: '#CD2E3A' },
-  { id: 'IRN',     name: 'Irán',            group: 'K', flag: '🇮🇷', color: '#239F40' },
-  { id: 'PER',     name: 'Perú',            group: 'K', flag: '🇵🇪', color: '#D91023' },
-  { id: 'RSA',     name: 'Sudáfrica',       group: 'K', flag: '🇿🇦', color: '#007A4D' },
+  { id: 'POR',  name: 'Portugal',        group: 'K', flag: '🇵🇹', color: '#006600' },
+  { id: 'COL',  name: 'Colombia',        group: 'K', flag: '🇨🇴', color: '#FCD116' },
+  { id: 'UZB',  name: 'Uzbekistán',      group: 'K', flag: '🇺🇿', color: '#1EB53A' },
+  { id: 'RDC',  name: 'R.D. Congo',      group: 'K', flag: '🇨🇩', color: '#007FFF' },
 
   // GRUPO L
-  { id: 'CRO',     name: 'Croacia',         group: 'L', flag: '🇭🇷', color: '#FF0000' },
-  { id: 'SUI',     name: 'Suiza',           group: 'L', flag: '🇨🇭', color: '#FF0000' },
-  { id: 'HND',     name: 'Honduras',        group: 'L', flag: '🇭🇳', color: '#0073CF' },
-  { id: 'CMR',     name: 'Camerún',         group: 'L', flag: '🇨🇲', color: '#007A5E' },
+  { id: 'ENG',  name: 'Inglaterra',      group: 'L', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', color: '#CF081F' },
+  { id: 'CRO',  name: 'Croacia',         group: 'L', flag: '🇭🇷', color: '#FF0000' },
+  { id: 'PAN',  name: 'Panamá',          group: 'L', flag: '🇵🇦', color: '#D21034' },
+  { id: 'GHA',  name: 'Ghana',           group: 'L', flag: '🇬🇭', color: '#006B3F' },
 ];
 
 // ---------------------------------------------------------------------------
