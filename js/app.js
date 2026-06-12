@@ -1,3 +1,12 @@
+(function() {
+  const DATA_VERSION = "2026-oficial-v2";
+  const stored = localStorage.getItem("qm2026_version");
+  if (stored !== DATA_VERSION) {
+    localStorage.removeItem("qm2026_matches");
+    localStorage.setItem("qm2026_version", DATA_VERSION);
+  }
+})();
+
 // =============================================================================
 // QUINIELA MUNDIAL 2026 — app.js
 // =============================================================================
