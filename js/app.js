@@ -1080,41 +1080,23 @@ function renderNotFound(container) {
 // ---------------------------------------------------------------------------
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const yearEl = document.getElementById('footer-year');
-  if (yearEl) yearEl.textContent = new Date().getFullYear();
-
-  const app = document.getElementById('app');
-  if (!app) return;
-
-  if (!window.location.hash || window.location.hash === '#') {
-    history.replaceState(null, '', '#grupos');
+  console.log('🚀 App iniciando...');
+  try {
+    console.log('📡 Conectando a Firestore...');
+    await fbInitMatches(MATCHES);
+    console.log('✅ Matches inicializados en Firestore');
+  } catch (err) {
+    console.error('❌ Error Firestore:', err);
   }
 
-  // Sembrar Firestore en el primer arranque (sólo si la colección está vacía)
-  if (typeof fbInitMatches === 'function') {
-    try { await fbInitMatches(MATCHES); } catch (e) { console.error('fbInitMatches:', e); }
-  }
+  fbOnMatchesChange(matches => {
+    STATE.matches = matches;
+    _rerenderCurrent();
+  });
 
-  window.addEventListener('hashchange', route);
+  fbOnParticipantsChange(participants => {
+    STATE.participants = participants;
+  });
+
   await route();
-
-  // Listeners en tiempo real — actualizan STATE y re-renderizan sin skeleton
-  if (typeof fbOnMatchesChange === 'function') {
-    fbOnMatchesChange(matches => {
-      STATE.matches = matches;
-      saveMatches(matches);
-      const h = window.location.hash || '#grupos';
-      if (['#grupos', '#bracket', '#participantes'].includes(h)) _rerenderCurrent();
-    });
-  }
-
-  if (typeof fbOnParticipantsChange === 'function') {
-    fbOnParticipantsChange(participants => {
-      STATE.participants = participants;
-      saveParticipants(participants);
-      updateParticipantBadge();
-      const h = window.location.hash || '#grupos';
-      if (['#grupos', '#participantes'].includes(h)) _rerenderCurrent();
-    });
-  }
 });

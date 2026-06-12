@@ -20,18 +20,22 @@ const db = firebase.firestore();
 // Seed matches collection on first ever load (collection is empty)
 // Splits into batches of 490 to respect Firestore's 500-op/batch limit
 // ---------------------------------------------------------------------------
-async function fbInitMatches(defaultMatches) {
-  const snap = await db.collection('matches').limit(1).get();
-  if (!snap.empty) return;
-
-  const CHUNK = 490;
-  for (let i = 0; i < defaultMatches.length; i += CHUNK) {
-    const batch = db.batch();
-    defaultMatches.slice(i, i + CHUNK).forEach(m => {
-      batch.set(db.collection('matches').doc(String(m.id)), m);
-    });
-    await batch.commit();
+async function fbInitMatches(matches) {
+  console.log('📝 Verificando matches en Firestore...');
+  const snap = await db.collection("matches").limit(1).get();
+  console.log('📊 Documentos existentes:', snap.size);
+  if (!snap.empty) {
+    console.log('✅ Matches ya existen, no se reinicializan');
+    return;
   }
+  console.log('⚡ Inicializando', matches.length, 'matches...');
+  const batch = db.batch();
+  matches.forEach(m => {
+    const ref = db.collection("matches").doc(String(m.id));
+    batch.set(ref, m);
+  });
+  await batch.commit();
+  console.log('🎉 Batch completado');
 }
 
 // ---------------------------------------------------------------------------
