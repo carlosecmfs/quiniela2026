@@ -310,6 +310,21 @@ function getGroupStatus(groupId) {
 // ---------------------------------------------------------------------------
 
 function renderGrupos(container) {
+  // Botón temporal de reset para usuarios con datos viejos
+  const resetBtn = document.createElement('div');
+  resetBtn.innerHTML = `
+    <div id="cache-reset-banner" style="
+      background:#e63946; color:white; text-align:center;
+      padding:10px; cursor:pointer; font-family:Inter,sans-serif;
+      font-size:14px; position:sticky; top:60px; z-index:999;">
+      ⚠️ Si ves grupos incorrectos haz clic aquí para actualizar
+    </div>`;
+  document.body.insertBefore(resetBtn, document.body.firstChild);
+  document.getElementById('cache-reset-banner').onclick = function() {
+    localStorage.clear();
+    location.reload();
+  };
+
   const section = document.createElement('section');
 
   // Encabezado de sección
