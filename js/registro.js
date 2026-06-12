@@ -153,7 +153,7 @@ function updateSubmitBtn() {
 // Form submit
 // ---------------------------------------------------------------------------
 
-function handleSubmit(e) {
+async function handleSubmit(e) {
   e.preventDefault();
   clearErrors();
 
@@ -201,6 +201,14 @@ function handleSubmit(e) {
 
   regParticipants.push(participant);
   saveParticipants(regParticipants);
+
+  if (typeof fbSaveParticipant === 'function') {
+    try {
+      await fbSaveParticipant(participant);
+    } catch (e) {
+      console.error('fbSaveParticipant error:', e);
+    }
+  }
 
   showSuccess(participant);
 }
@@ -287,10 +295,21 @@ function renderParticipantsList() {
 // Init
 // ---------------------------------------------------------------------------
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   // Footer year
   const yearEl = document.getElementById('footer-year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+  // Cargar participantes desde Firebase (con fallback a localStorage)
+  if (typeof fbGetParticipants === 'function') {
+    try {
+      const fbParticipants = await fbGetParticipants();
+      regParticipants = fbParticipants;
+      saveParticipants(regParticipants);
+    } catch (e) {
+      console.error('Firebase participants load error:', e);
+    }
+  }
 
   // Render team picker
   renderTeamPicker();

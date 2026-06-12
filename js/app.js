@@ -37,12 +37,29 @@ const STATE = {
   adminLogged:  false,
 };
 
-function loadState() {
-  STATE.matches      = loadMatches();      // data.js
-  STATE.participants = loadParticipants(); // data.js
-  STATE.adminLogged  = localStorage.getItem(LS_KEYS.ADMIN) === 'true';
+async function loadState() {
+  if (typeof fbGetMatches === 'function') {
+    try {
+      const [matches, participants] = await Promise.all([
+        fbGetMatches(),
+        fbGetParticipants(),
+      ]);
+      STATE.matches      = matches.length ? matches : loadMatches();
+      STATE.participants = participants;
+    } catch (e) {
+      console.error('Firebase load error, usando localStorage:', e);
+      STATE.matches      = loadMatches();
+      STATE.participants = loadParticipants();
+    }
+  } else {
+    STATE.matches      = loadMatches();
+    STATE.participants = loadParticipants();
+  }
+  STATE.adminLogged = localStorage.getItem(LS_KEYS.ADMIN) === 'true';
 }
 
+// Shim — las escrituras individuales llaman a sus contrapartes Firebase directamente.
+// Se conserva para compatibilidad con llamadas existentes (p.ej. handleReset).
 function saveState() {
   saveMatches(STATE.matches);
   saveParticipants(STATE.participants);
@@ -63,6 +80,9 @@ function updateMatch(id, score1, score2) {
   m.score2  = Number(score2);
   m.played  = true;
   saveState();
+  if (typeof fbUpdateMatch === 'function') {
+    fbUpdateMatch(m).catch(e => console.error('fbUpdateMatch error:', e));
+  }
 }
 
 // Participant schema helpers — handle both old { nombre, equipo } and new { name, teams }
@@ -218,14 +238,13 @@ function buildSkeleton() {
 // Router
 // ---------------------------------------------------------------------------
 
-function route() {
+async function route() {
   const app = document.getElementById('app');
   if (!app) return;
 
   const hash = window.location.hash || '#grupos';
 
-  // Re-read localStorage so new registrations from registro.html are visible immediately
-  loadState();
+  await loadState();
 
   // Mark active nav tab
   document.querySelectorAll('.nav-link[data-view]').forEach(link => {
@@ -1027,6 +1046,22 @@ function renderParticipantes(container) {
 }
 
 // ---------------------------------------------------------------------------
+// _rerenderCurrent — re-render ligero sin skeleton (usado por listeners Firebase)
+// ---------------------------------------------------------------------------
+
+function _rerenderCurrent() {
+  const app = document.getElementById('app');
+  if (!app) return;
+  const hash = window.location.hash || '#grupos';
+  const renderFn = ROUTES[hash];
+  if (!renderFn) return;
+  app.innerHTML = '';
+  renderFn(app);
+  void app.offsetWidth;
+  app.classList.add('anim-enter');
+}
+
+// ---------------------------------------------------------------------------
 // renderNotFound — ruta desconocida
 // ---------------------------------------------------------------------------
 
@@ -1044,11 +1079,9 @@ function renderNotFound(container) {
 // 12. Init
 // ---------------------------------------------------------------------------
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const yearEl = document.getElementById('footer-year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
-
-  loadState();
 
   const app = document.getElementById('app');
   if (!app) return;
@@ -1056,6 +1089,32 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!window.location.hash || window.location.hash === '#') {
     history.replaceState(null, '', '#grupos');
   }
+
+  // Sembrar Firestore en el primer arranque (sólo si la colección está vacía)
+  if (typeof fbInitMatches === 'function') {
+    try { await fbInitMatches(MATCHES); } catch (e) { console.error('fbInitMatches:', e); }
+  }
+
   window.addEventListener('hashchange', route);
-  route();
+  await route();
+
+  // Listeners en tiempo real — actualizan STATE y re-renderizan sin skeleton
+  if (typeof fbOnMatchesChange === 'function') {
+    fbOnMatchesChange(matches => {
+      STATE.matches = matches;
+      saveMatches(matches);
+      const h = window.location.hash || '#grupos';
+      if (['#grupos', '#bracket', '#participantes'].includes(h)) _rerenderCurrent();
+    });
+  }
+
+  if (typeof fbOnParticipantsChange === 'function') {
+    fbOnParticipantsChange(participants => {
+      STATE.participants = participants;
+      saveParticipants(participants);
+      updateParticipantBadge();
+      const h = window.location.hash || '#grupos';
+      if (['#grupos', '#participantes'].includes(h)) _rerenderCurrent();
+    });
+  }
 });

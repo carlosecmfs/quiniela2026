@@ -26,26 +26,21 @@ Cada push al repo actualiza el sitio automáticamente.
 
 ---
 
-## Notas importantes sobre los datos
+## Datos en tiempo real — Firebase Firestore
 
-Los datos (participantes y resultados) se guardan en **localStorage del navegador**,
-no en un servidor. Esto significa:
+Los datos (participantes y resultados) se almacenan en **Firebase Firestore** y
+se sincronizan en tiempo real entre todos los dispositivos.
 
-- Cada usuario ve **sus propios datos** en su propio dispositivo
-- Para que todos vean los mismos datos, el admin debe usar **un solo dispositivo**
-  como "central" (todos abren la URL y el admin actualiza resultados ahí)
+- Cualquier participante puede registrarse desde su propio dispositivo
+- El admin actualiza resultados y **todos los usuarios ven los cambios en segundos**
+- No es necesario recargar la página
 
-### Flujo recomendado para usar la quiniela en grupo:
+### Flujo de uso:
 
 1. El organizador comparte la URL de Netlify
-2. Cada participante abre la URL en **su propio dispositivo** y se registra
-3. El organizador abre la URL en **su dispositivo** y:
-   - Va a `#admin` → introduce la contraseña `quiniela2026`
-   - Actualiza los resultados de los partidos
-4. Todos recargan la página para ver los resultados actualizados
-
-> En el futuro se puede integrar Firebase Firestore para datos compartidos en tiempo real,
-> sin cambiar el frontend (solo agregar `firebase.js` y reemplazar las llamadas a localStorage).
+2. Cada participante abre la URL en su dispositivo y se registra en `/registro`
+3. El admin va a `#admin` → contraseña `quiniela2026` → actualiza resultados
+4. Todos ven la tabla de posiciones actualizada en tiempo real
 
 ---
 
@@ -71,6 +66,7 @@ QUINIELA/
 ├── css/
 │   └── styles.css      ← Todos los estilos (~2400 líneas)
 └── js/
+    ├── firebase.js     ← Configuración y helpers de Firebase Firestore
     ├── data.js         ← Equipos, partidos, localStorage helpers
     ├── app.js          ← Router SPA, vistas, lógica de puntos
     ├── admin.js        ← Panel de administración

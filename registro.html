@@ -110,9 +110,12 @@
 
   <!-- canvas-confetti CDN -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
-  <!-- data.js primero (expone TEAMS, GROUP_IDS, loadParticipants, saveParticipants, getTeam) -->
+  <!-- Firebase v9 compat (CDN) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <!-- Orden de carga: firebase.js → data.js → registro.js -->
+  <script src="js/firebase.js"></script>
   <script src="js/data.js"></script>
-  <!-- registro.js: lógica independiente de esta página -->
   <script src="js/registro.js"></script>
 </body>
 </html>

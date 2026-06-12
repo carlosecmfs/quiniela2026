@@ -522,6 +522,9 @@ function saveMatchRow(tr, matchId, feedbackEl) {
   }
 
   saveState();
+  if (typeof fbUpdateMatch === 'function') {
+    fbUpdateMatch(m).catch(e => console.error('fbUpdateMatch error:', e));
+  }
 
   tr.className = [m.played ? 'row-played' : '', m.live ? 'row-live' : ''].filter(Boolean).join(' ');
 
@@ -690,10 +693,13 @@ function buildParticipantsTable(tabWrap) {
       </td>
     `;
 
-    tr.querySelector('button[data-pid]').addEventListener('click', () => {
+    tr.querySelector('button[data-pid]').addEventListener('click', async () => {
       if (!confirm(`¿Eliminar a "${pName}"?`)) return;
       STATE.participants = STATE.participants.filter(x => x.id !== p.id);
       saveParticipants(STATE.participants);
+      if (typeof fbDeleteParticipant === 'function') {
+        await fbDeleteParticipant(p.id).catch(e => console.error('fbDeleteParticipant:', e));
+      }
       // Rebuild table section
       const tw = tabWrap.querySelector('#participants-table-wrap');
       tw.innerHTML = '';
@@ -749,7 +755,7 @@ function toggleAddModal(tabWrap) {
 
   modal.querySelector('#mod-cancel').addEventListener('click', () => { slot.innerHTML = ''; });
 
-  modal.querySelector('#mod-save').addEventListener('click', () => {
+  modal.querySelector('#mod-save').addEventListener('click', async () => {
     const nombre  = modal.querySelector('#mod-nombre').value.trim();
     const equipo  = modal.querySelector('#mod-equipo').value;
     const errN    = modal.querySelector('#mod-err-nombre');
@@ -764,12 +770,16 @@ function toggleAddModal(tabWrap) {
     }
     if (!ok) return;
 
-    STATE.participants.push({
+    const newP = {
       id: Date.now(), name: nombre, nombre, equipo,
       teams: equipo ? [equipo] : [],
       registeredAt: new Date().toISOString(), fechaRegistro: new Date().toISOString(),
-    });
+    };
+    STATE.participants.push(newP);
     saveParticipants(STATE.participants);
+    if (typeof fbSaveParticipant === 'function') {
+      await fbSaveParticipant(newP).catch(e => console.error('fbSaveParticipant:', e));
+    }
     slot.innerHTML = '';
 
     const tw = tabWrap.querySelector('#participants-table-wrap');
@@ -786,7 +796,7 @@ function toggleAddModal(tabWrap) {
 // 14. handleReset — doble confirmación, resetea resultados
 // =============================================================================
 
-function handleReset(container, contentEl) {
+async function handleReset(container, contentEl) {
   if (!confirm('⚠️ ¿Resetear TODOS los resultados del torneo?\n\nEsta acción no puede deshacerse. Los participantes NO se borrarán.')) return;
 
   const word = prompt('Para confirmar, escribe exactamente:\n\nRESETEAR');
@@ -800,8 +810,25 @@ function handleReset(container, contentEl) {
     m.score2 = null;
     m.played = false;
     m.live   = false;
+    delete m.winner;
   });
   saveState();
+
+  // Persistir reset a Firestore en lotes de 490
+  if (typeof db !== 'undefined') {
+    try {
+      const CHUNK = 490;
+      for (let i = 0; i < STATE.matches.length; i += CHUNK) {
+        const batch = db.batch();
+        STATE.matches.slice(i, i + CHUNK).forEach(m => {
+          batch.set(db.collection('matches').doc(String(m.id)), m);
+        });
+        await batch.commit();
+      }
+    } catch (e) {
+      console.error('handleReset Firestore error:', e);
+    }
+  }
 
   // Actualiza el tab activo
   renderAdminTabContent(contentEl, _activeAdminTab);
