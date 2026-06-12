@@ -1,8 +1,10 @@
 (function() {
-  const DATA_VERSION = "2026-oficial-v2";
+  const DATA_VERSION = "2026-oficial-v3";
   const stored = localStorage.getItem("qm2026_version");
   if (stored !== DATA_VERSION) {
     localStorage.removeItem("qm2026_matches");
+    localStorage.removeItem("qm2026_participants");
+    localStorage.removeItem("qm2026_admin");
     localStorage.setItem("qm2026_version", DATA_VERSION);
   }
 })();
