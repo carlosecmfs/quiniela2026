@@ -1,0 +1,39 @@
+[build]
+  publish = "."
+
+# ── Security headers (all pages) ──────────────────────────────────────────────
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options         = "DENY"
+    X-Content-Type-Options  = "nosniff"
+    Referrer-Policy         = "no-referrer"
+    Cache-Control           = "no-cache"
+
+# ── Long-lived cache for versioned static assets ──────────────────────────────
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+# ── Pretty URLs ───────────────────────────────────────────────────────────────
+[[redirects]]
+  from   = "/registro"
+  to     = "/registro.html"
+  status = 200
+
+[[redirects]]
+  from   = "/admin"
+  to     = "/index.html#admin"
+  status = 302
+
+# ── SPA fallback (must be last) ───────────────────────────────────────────────
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200

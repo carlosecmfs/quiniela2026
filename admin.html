@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Quiniela Mundial 2026</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="page-admin">
+
+  <!-- ===================================================================
+       HEADER (simplificado para admin)
+       =================================================================== -->
+  <header id="site-header">
+    <div class="header-inner">
+      <h1 class="logo">
+        <a href="index.html" class="logo-back">&#8592;</a>
+        <span class="logo-quiniela">QUINIELA</span>
+        <span class="logo-mundial">MUNDIAL</span>
+        <span class="logo-year">2026</span>
+        <span class="logo-tag">ADMIN</span>
+      </h1>
+    </div>
+  </header>
+
+  <!-- ===================================================================
+       LOGIN SCREEN (visible cuando no hay sesión)
+       =================================================================== -->
+  <section id="admin-login" class="admin-login-screen" aria-label="Acceso administrador">
+    <form id="login-form" class="login-form" novalidate>
+      <h2>Acceso Administrador</h2>
+      <label for="admin-password">Contraseña</label>
+      <input
+        type="password"
+        id="admin-password"
+        name="password"
+        autocomplete="current-password"
+        placeholder="••••••••••••"
+        required
+      />
+      <button type="submit" class="btn btn-primary">Entrar</button>
+      <p id="login-error" class="error-msg" role="alert" hidden>Contraseña incorrecta.</p>
+    </form>
+  </section>
+
+  <!-- ===================================================================
+       PANEL PRINCIPAL (visible tras autenticación)
+       =================================================================== -->
+  <main id="admin-panel" class="admin-panel" hidden aria-label="Panel de administración">
+
+    <!-- Barra de acciones -->
+    <div class="admin-toolbar">
+      <nav class="admin-tabs" role="tablist" aria-label="Secciones del panel">
+        <button role="tab" data-tab="partidos"      class="tab-btn active">Partidos</button>
+        <button role="tab" data-tab="participantes" class="tab-btn">Participantes</button>
+        <button role="tab" data-tab="exportar"      class="tab-btn">Exportar</button>
+      </nav>
+      <button id="btn-logout" class="btn btn-outline btn-sm">Cerrar sesión</button>
+    </div>
+
+    <!-- === Tab: Partidos ================================================ -->
+    <section id="tab-partidos" class="tab-panel" role="tabpanel" aria-label="Gestión de partidos">
+      <!-- contenido inyectado por admin.js -->
+    </section>
+
+    <!-- === Tab: Participantes =========================================== -->
+    <section id="tab-participantes" class="tab-panel" role="tabpanel" aria-label="Gestión de participantes" hidden>
+      <!-- contenido inyectado por admin.js -->
+    </section>
+
+    <!-- === Tab: Exportar ================================================ -->
+    <section id="tab-exportar" class="tab-panel" role="tabpanel" aria-label="Exportar datos" hidden>
+      <!-- contenido inyectado por admin.js -->
+    </section>
+
+  </main>
+
+  <script src="js/data.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

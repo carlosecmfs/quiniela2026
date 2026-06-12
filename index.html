@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiniela Mundial 2026 🏆</title>
+  <meta name="description" content="Quiniela del Mundial FIFA 2026. Sigue el bracket, los resultados y la tabla de posiciones de tu grupo.">
+  <meta name="theme-color" content="#00A550">
+  <meta property="og:title" content="Quiniela Mundial 2026 🏆">
+  <meta property="og:description" content="¿Quién ganará el Mundial 2026? Únete a la quiniela.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- =====================================================================
+       HEADER — sticky, logo animado
+       ===================================================================== -->
+  <header id="site-header">
+    <div class="header-inner">
+      <h1 class="logo" aria-label="Quiniela Mundial 2026">
+        <span class="logo-quiniela">QUINIELA</span>
+        <span class="logo-mundial">MUNDIAL</span>
+        <span class="logo-year">2026</span>
+      </h1>
+      <p class="header-subtitle">FIFA World Cup &nbsp;·&nbsp; USA &nbsp;·&nbsp; México &nbsp;·&nbsp; Canadá</p>
+    </div>
+  </header>
+
+  <!-- =====================================================================
+       NAVIGATION — hash-based SPA tabs
+       data-view debe coincidir con la clave en ROUTES de app.js
+       ===================================================================== -->
+  <nav id="site-nav" aria-label="Navegación principal">
+    <ul class="nav-list">
+      <li><a href="#grupos"        class="nav-link" data-view="grupos">Grupos</a></li>
+      <li><a href="#bracket"       class="nav-link" data-view="bracket">Bracket</a></li>
+      <li><a href="#participantes" class="nav-link" data-view="participantes">Participantes</a></li>
+      <li><a href="registro.html"  class="nav-link nav-cta">Registrarse</a></li>
+      <li><a href="#admin" class="nav-link nav-admin" data-view="admin" aria-label="Panel de administración">&#9881; Admin</a></li>
+    </ul>
+  </nav>
+
+  <!-- =====================================================================
+       MAIN — contenedor SPA.  app.js inyecta vistas aquí según el hash.
+       aria-live="polite" notifica a lectores de pantalla los cambios de vista.
+       ===================================================================== -->
+  <main id="app" role="main" aria-live="polite" aria-atomic="false">
+    <!-- Estado inicial: spinner mientras JS carga -->
+    <div class="empty-state" style="padding-top:5rem">
+      <div class="spinner" role="status" aria-label="Cargando"></div>
+    </div>
+  </main>
+
+  <!-- =====================================================================
+       FOOTER
+       ===================================================================== -->
+  <footer id="site-footer">
+    <p>Quiniela Mundial 2026 &copy; <span id="footer-year"></span> &nbsp;·&nbsp; Sin backend &nbsp;·&nbsp; Datos en localStorage</p>
+  </footer>
+
+  <!-- Orden de carga: data.js → app.js → admin.js
+       admin.js se carga al final para acceder a STATE y ROUTES de app.js -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

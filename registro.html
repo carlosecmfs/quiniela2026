@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Únete · Quiniela Mundial 2026</title>
+  <meta name="description" content="Únete a la Quiniela del Mundial FIFA 2026. Elige tus 3 equipos favoritos.">
+  <meta name="theme-color" content="#00A550">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="page-registro">
+
+  <!-- =====================================================================
+       HEADER
+       ===================================================================== -->
+  <header id="site-header">
+    <div class="header-inner">
+      <h1 class="logo">
+        <a href="index.html" class="logo-back" aria-label="Volver al inicio">&#8592;</a>
+        <span class="logo-quiniela">QUINIELA</span>
+        <span class="logo-mundial">MUNDIAL</span>
+        <span class="logo-year">2026</span>
+      </h1>
+      <p class="header-subtitle">FIFA World Cup &nbsp;·&nbsp; USA &nbsp;·&nbsp; México &nbsp;·&nbsp; Canadá</p>
+    </div>
+  </header>
+
+  <!-- =====================================================================
+       MAIN
+       ===================================================================== -->
+  <main id="main-registro" role="main">
+    <div class="registro-container">
+
+      <h2 class="section-title">Unirse a la Quiniela</h2>
+      <p class="section-subtitle">
+        Elige <strong>3 equipos</strong> que crees que llegarán lejos. ¡Gana puntos a medida que avancen!
+      </p>
+
+      <!-- ── FORMULARIO ─────────────────────────────────────────────────── -->
+      <form id="registro-form" class="registro-form" novalidate>
+
+        <!-- Nombre -->
+        <div class="form-group">
+          <label for="reg-nombre">Tu nombre o apodo</label>
+          <input
+            type="text"
+            id="reg-nombre"
+            name="nombre"
+            maxlength="30"
+            placeholder="¿Cómo te llaman?"
+            autocomplete="given-name"
+            required
+          />
+          <span class="field-error" id="err-nombre" role="alert"></span>
+        </div>
+
+        <!-- Selector de equipos -->
+        <div class="form-group" id="team-picker-group">
+          <div class="team-picker-header">
+            <label>Selecciona exactamente 3 equipos</label>
+            <span class="team-counter" id="team-counter">0 / 3 equipos</span>
+          </div>
+          <span class="field-error" id="err-equipos" role="alert"></span>
+          <!-- Grid inyectado por registro.js -->
+          <div id="team-picker" class="team-picker" role="group" aria-label="Selección de equipos"></div>
+        </div>
+
+        <!-- Código de acceso (opcional) -->
+        <div class="form-group">
+          <label for="reg-codigo">Código de acceso <span class="label-optional">(opcional)</span></label>
+          <input
+            type="password"
+            id="reg-codigo"
+            name="codigo"
+            placeholder="••••••••••"
+            autocomplete="off"
+          />
+          <span class="label-hint">Pide el código a tu organizador</span>
+          <span class="field-error" id="err-codigo" role="alert"></span>
+        </div>
+
+        <!-- Feedback global -->
+        <div id="reg-feedback" class="registro-feedback" role="alert" hidden></div>
+
+        <!-- Submit -->
+        <button type="submit" id="reg-submit" class="btn btn-primary btn-lg" disabled>
+          ¡Quiero participar! ⚽
+        </button>
+
+      </form>
+
+      <!-- ── LISTA de participantes actuales ────────────────────────────── -->
+      <div class="participantes-preview" id="reg-participants-preview">
+        <h3>Participantes registrados</h3>
+        <ul id="reg-participants-list"></ul>
+      </div>
+
+    </div><!-- .registro-container -->
+  </main>
+
+  <!-- =====================================================================
+       FOOTER
+       ===================================================================== -->
+  <footer id="site-footer">
+    <p>Quiniela Mundial 2026 &copy; <span id="footer-year"></span></p>
+  </footer>
+
+  <!-- canvas-confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  <!-- data.js primero (expone TEAMS, GROUP_IDS, loadParticipants, saveParticipants, getTeam) -->
+  <script src="js/data.js"></script>
+  <!-- registro.js: lógica independiente de esta página -->
+  <script src="js/registro.js"></script>
+</body>
+</html>
