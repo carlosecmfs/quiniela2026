@@ -126,7 +126,9 @@ function calcTeamPts(teamId) {
       const isWin = m.winner
         ? m.winner === teamId
         : ((m.team1 === teamId && s1 > s2) || (m.team2 === teamId && s2 > s1));
-      if (isWin) pts++;
+      const isDraw = !m.winner && s1 === s2;
+      if (isWin) pts += 3;
+      else if (isDraw) pts += 1;
     });
   const inPhase = ph =>
     STATE.matches.some(m => m.phase === ph && (m.team1 === teamId || m.team2 === teamId));
@@ -238,31 +240,43 @@ function buildSkeleton() {
 // Router
 // ---------------------------------------------------------------------------
 
-async function route() {
-  const app = document.getElementById('app');
-  if (!app) return;
+let lastLoaded = 0;
 
+async function route() {
   const hash = window.location.hash || '#grupos';
 
-  await loadState();
-
-  // Mark active nav tab
-  document.querySelectorAll('.nav-link[data-view]').forEach(link => {
-    link.classList.toggle('active', link.getAttribute('href') === hash);
+  document.querySelectorAll('.nav-link[data-view]').forEach(l => {
+    l.classList.toggle('active', '#' + l.dataset.view === hash);
   });
   updateParticipantBadge();
 
-  // Show skeleton, then render after 300 ms (prevents blank-content flash)
-  app.innerHTML = buildSkeleton();
-  app.classList.remove('anim-enter');
+  const container = document.getElementById('app');
+  if (!container) return;
 
-  const renderFn = ROUTES[hash];
-  setTimeout(() => {
-    app.innerHTML = '';
-    if (renderFn) renderFn(app); else renderNotFound(app);
-    void app.offsetWidth; // reflow for animation restart
-    app.classList.add('anim-enter');
-  }, 300);
+  const fn = ROUTES[hash];
+  container.innerHTML = '';
+  if (fn) fn(container);
+  else renderNotFound(container);
+  void container.offsetWidth;
+  container.classList.add('anim-enter');
+
+  const now = Date.now();
+  if (now - lastLoaded > 30000 && typeof fbGetMatches === 'function') {
+    lastLoaded = now;
+    try {
+      const [matches, participants] = await Promise.all([
+        fbGetMatches(),
+        fbGetParticipants()
+      ]);
+      STATE.matches      = matches.length ? matches : STATE.matches;
+      STATE.participants = participants;
+      container.innerHTML = '';
+      if (fn) fn(container);
+      else renderNotFound(container);
+    } catch (e) {
+      console.error('route refresh error:', e);
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -329,21 +343,6 @@ function getGroupStatus(groupId) {
 // ---------------------------------------------------------------------------
 
 function renderGrupos(container) {
-  // Botón temporal de reset para usuarios con datos viejos
-  const resetBtn = document.createElement('div');
-  resetBtn.innerHTML = `
-    <div id="cache-reset-banner" style="
-      background:#e63946; color:white; text-align:center;
-      padding:10px; cursor:pointer; font-family:Inter,sans-serif;
-      font-size:14px; position:sticky; top:60px; z-index:999;">
-      ⚠️ Si ves grupos incorrectos haz clic aquí para actualizar
-    </div>`;
-  document.body.insertBefore(resetBtn, document.body.firstChild);
-  document.getElementById('cache-reset-banner').onclick = function() {
-    localStorage.clear();
-    location.reload();
-  };
-
   const section = document.createElement('section');
 
   // Encabezado de sección

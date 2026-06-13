@@ -18,7 +18,7 @@ const TEAMS = [
   { id: 'CAN',  name: 'Canadá',          group: 'B', flag: '🇨🇦', color: '#FF0000' },
   { id: 'SUI',  name: 'Suiza',           group: 'B', flag: '🇨🇭', color: '#D52B1E' },
   { id: 'QAT',  name: 'Catar',           group: 'B', flag: '🇶🇦', color: '#8D1B3D' },
-  { id: 'ITA',  name: 'Italia',          group: 'B', flag: '🇮🇹', color: '#009246' },
+  { id: 'BIH',  name: 'Bosnia-Herzegovina', group: 'B', flag: '🇧🇦', color: '#002395' },
 
   // GRUPO C
   { id: 'BRA',  name: 'Brasil',          group: 'C', flag: '🇧🇷', color: '#009C3B' },

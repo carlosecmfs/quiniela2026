@@ -573,7 +573,9 @@ function calcParticipantPoints(participant) {
         const isWin = m.winner
           ? m.winner === teamId
           : ((m.team1 === teamId && s1 > s2) || (m.team2 === teamId && s2 > s1));
-        if (isWin) pts += 1;
+        const isDraw = !m.winner && s1 === s2;
+        if (isWin) pts += 3;
+        else if (isDraw) pts += 1;
       });
 
     const inPhase = phase =>
