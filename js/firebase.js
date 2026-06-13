@@ -17,25 +17,42 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // ---------------------------------------------------------------------------
-// Seed matches collection on first ever load (collection is empty)
-// Splits into batches of 490 to respect Firestore's 500-op/batch limit
+// Seed matches collection on first ever load (collection is empty).
+// If Grupo B still has Italy (stale data), wipes and reinitializes.
 // ---------------------------------------------------------------------------
 async function fbInitMatches(matches) {
   console.log('📝 Verificando matches en Firestore...');
   const snap = await db.collection("matches").limit(1).get();
   console.log('📊 Documentos existentes:', snap.size);
   if (!snap.empty) {
-    console.log('✅ Matches ya existen, no se reinicializan');
-    return;
+    const italySnap = await db.collection("matches")
+      .where("group", "==", "B")
+      .where("team1", "==", "ITA")
+      .limit(1).get();
+    if (italySnap.empty) {
+      const italySnap2 = await db.collection("matches")
+        .where("group", "==", "B")
+        .where("team2", "==", "ITA")
+        .limit(1).get();
+      if (italySnap2.empty) {
+        console.log('✅ Matches ya existen con datos correctos');
+        return;
+      }
+    }
+    console.log('🔄 Detectado datos viejos con Italia, reinicializando...');
+    const allSnap = await db.collection("matches").get();
+    const delBatch = db.batch();
+    allSnap.docs.forEach(d => delBatch.delete(d.ref));
+    await delBatch.commit();
   }
-  console.log('⚡ Inicializando', matches.length, 'matches...');
+  console.log('⚡ Inicializando', matches.length, 'matches con datos correctos...');
   const batch = db.batch();
   matches.forEach(m => {
     const ref = db.collection("matches").doc(String(m.id));
     batch.set(ref, m);
   });
   await batch.commit();
-  console.log('🎉 Batch completado');
+  console.log('🎉 Firestore actualizado con grupos oficiales');
 }
 
 // ---------------------------------------------------------------------------

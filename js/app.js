@@ -240,44 +240,38 @@ function buildSkeleton() {
 // Router
 // ---------------------------------------------------------------------------
 
-let lastLoaded = 0;
-
-async function route() {
+function renderCurrentView() {
   const hash = window.location.hash || '#grupos';
-
+  const container = document.getElementById('app');
+  if (!container) return;
   document.querySelectorAll('.nav-link[data-view]').forEach(l => {
     l.classList.toggle('active', '#' + l.dataset.view === hash);
   });
   updateParticipantBadge();
-
-  const container = document.getElementById('app');
-  if (!container) return;
-
   const fn = ROUTES[hash];
   container.innerHTML = '';
   if (fn) fn(container);
   else renderNotFound(container);
   void container.offsetWidth;
   container.classList.add('anim-enter');
-
-  const now = Date.now();
-  if (now - lastLoaded > 30000 && typeof fbGetMatches === 'function') {
-    lastLoaded = now;
-    try {
-      const [matches, participants] = await Promise.all([
-        fbGetMatches(),
-        fbGetParticipants()
-      ]);
-      STATE.matches      = matches.length ? matches : STATE.matches;
-      STATE.participants = participants;
-      container.innerHTML = '';
-      if (fn) fn(container);
-      else renderNotFound(container);
-    } catch (e) {
-      console.error('route refresh error:', e);
-    }
-  }
 }
+
+async function refreshFromFirestore() {
+  const [matches, participants] = await Promise.all([
+    fbGetMatches(),
+    fbGetParticipants()
+  ]);
+  STATE.matches      = matches.length ? matches : STATE.matches;
+  STATE.participants = participants;
+}
+
+function route() {
+  renderCurrentView();
+}
+
+window.addEventListener('hashchange', () => {
+  renderCurrentView();
+});
 
 // ---------------------------------------------------------------------------
 // 4. calcGroupStandings(groupId) → array ordenado por Pts/GD/GF/Nombre
@@ -1084,18 +1078,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('📡 Conectando a Firestore...');
     await fbInitMatches(MATCHES);
     console.log('✅ Matches inicializados en Firestore');
+    await refreshFromFirestore();
+    console.log('✅ Estado cargado desde Firestore');
   } catch (err) {
     console.error('❌ Error Firestore:', err);
   }
 
   fbOnMatchesChange(matches => {
     STATE.matches = matches;
-    _rerenderCurrent();
+    renderCurrentView();
   });
 
   fbOnParticipantsChange(participants => {
     STATE.participants = participants;
   });
 
-  await route();
+  renderCurrentView();
 });
