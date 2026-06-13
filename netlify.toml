@@ -10,16 +10,21 @@
     Referrer-Policy         = "no-referrer"
     Cache-Control           = "no-cache"
 
-# ── Long-lived cache for versioned static assets ──────────────────────────────
-[[headers]]
-  for = "/css/*"
-  [headers.values]
-    Cache-Control = "public, max-age=604800"
-
+# ── No-cache for JS, CSS and HTML ────────────────────────────────────────────
 [[headers]]
   for = "/js/*"
   [headers.values]
-    Cache-Control = "public, max-age=604800"
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
 
 # ── Pretty URLs ───────────────────────────────────────────────────────────────
 [[redirects]]
