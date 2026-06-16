@@ -25,21 +25,44 @@ async function fbInitMatches(matches) {
   const snap = await db.collection("matches").limit(1).get();
   console.log('📊 Documentos existentes:', snap.size);
   if (!snap.empty) {
+    let forceReinit = false;
+
     const italySnap = await db.collection("matches")
       .where("group", "==", "B")
       .where("team1", "==", "ITA")
       .limit(1).get();
-    if (italySnap.empty) {
+    if (!italySnap.empty) forceReinit = true;
+
+    if (!forceReinit) {
       const italySnap2 = await db.collection("matches")
         .where("group", "==", "B")
         .where("team2", "==", "ITA")
         .limit(1).get();
-      if (italySnap2.empty) {
-        console.log('✅ Matches ya existen con datos correctos');
-        return;
-      }
+      if (!italySnap2.empty) forceReinit = true;
     }
-    console.log('🔄 Detectado datos viejos con Italia, reinicializando...');
+
+    if (!forceReinit) {
+      const checkUkraine = await db.collection("matches")
+        .where("group", "==", "F")
+        .where("team1", "==", "UKR")
+        .limit(1).get();
+      if (!checkUkraine.empty) forceReinit = true;
+    }
+
+    if (!forceReinit) {
+      const checkUkraine2 = await db.collection("matches")
+        .where("group", "==", "F")
+        .where("team2", "==", "UKR")
+        .limit(1).get();
+      if (!checkUkraine2.empty) forceReinit = true;
+    }
+
+    if (!forceReinit) {
+      console.log('✅ Matches ya existen con datos correctos');
+      return;
+    }
+
+    console.log('🔄 Detectado datos viejos (Italia/Ucrania), reinicializando...');
     const allSnap = await db.collection("matches").get();
     const delBatch = db.batch();
     allSnap.docs.forEach(d => delBatch.delete(d.ref));

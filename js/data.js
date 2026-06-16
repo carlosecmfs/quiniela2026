@@ -42,7 +42,7 @@ const TEAMS = [
   { id: 'NED',  name: 'Países Bajos',    group: 'F', flag: '🇳🇱', color: '#FF6600' },
   { id: 'JPN',  name: 'Japón',           group: 'F', flag: '🇯🇵', color: '#BC002D' },
   { id: 'TUN',  name: 'Túnez',           group: 'F', flag: '🇹🇳', color: '#E70013' },
-  { id: 'UKR',  name: 'Ucrania',         group: 'F', flag: '🇺🇦', color: '#005BBB' },
+  { id: 'SWE',  name: 'Suecia',           group: 'F', flag: '🇸🇪', color: '#006AA7' },
 
   // GRUPO G
   { id: 'BEL',  name: 'Bélgica',         group: 'G', flag: '🇧🇪', color: '#EF3340' },
