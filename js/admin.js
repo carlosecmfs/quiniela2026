@@ -48,8 +48,53 @@ function renderAdminView(container) {
   if (!STATE.adminLogged) {
     container.appendChild(buildLoginScreen(container));
   } else {
+    syncAllAdvancement(); // propaga ganadores ya registrados
     container.appendChild(buildAdminPanel(container));
   }
+}
+
+// =============================================================================
+// advanceWinner — propaga el ganador de un partido al slot del siguiente
+// =============================================================================
+
+function advanceWinner(matchId) {
+  const match = STATE.matches.find(m => m.id === matchId);
+  if (!match || !match.played) return;
+
+  const advance = (typeof ADVANCE_MAP !== 'undefined') ? ADVANCE_MAP[matchId] : null;
+  if (!advance) return; // final u otro sin siguiente ronda
+
+  // Determinar ganador
+  let winnerId;
+  if (match.winner) {
+    winnerId = match.winner;
+  } else if (match.score1 != null && match.score2 != null) {
+    const s1 = Number(match.score1), s2 = Number(match.score2);
+    if (s1 > s2) winnerId = match.team1;
+    else if (s2 > s1) winnerId = match.team2;
+    else return; // empate sin ganador definido aún
+  } else {
+    return;
+  }
+
+  if (!winnerId) return;
+
+  const nextMatch = STATE.matches.find(m => m.id === advance.next);
+  if (!nextMatch) return;
+
+  // Solo actualizar si cambió algo (evita escrituras redundantes a Firestore)
+  if (nextMatch[advance.slot] === winnerId) return;
+
+  nextMatch[advance.slot] = winnerId;
+  if (typeof fbUpdateMatch === 'function') {
+    fbUpdateMatch(nextMatch).catch(e => console.error('advanceWinner fbUpdateMatch:', e));
+  }
+}
+
+// Propaga ganadores de TODOS los partidos ya jugados (para sincronizar al cargar)
+function syncAllAdvancement() {
+  const played = STATE.matches.filter(m => m.played && m.phase !== 'groups');
+  played.forEach(m => advanceWinner(m.id));
 }
 
 // =============================================================================
@@ -547,6 +592,11 @@ function saveMatchRow(tr, matchId, feedbackEl) {
       badge.textContent  = `${played}/6 jugados`;
       badge.className    = `badge ${played === 6 ? 'badge-green' : played > 0 ? 'badge-gold' : 'badge-gray'} accordion-badge`;
     }
+  }
+
+  // Avanzar ganador al siguiente partido (fases KO)
+  if (m.phase !== 'groups') {
+    advanceWinner(matchId);
   }
 }
 

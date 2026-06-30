@@ -236,6 +236,48 @@ const PHASES = [
 ];
 
 // ---------------------------------------------------------------------------
+// ADVANCE_MAP — mapeo de avance automático de ganadores por fase
+// Cada entrada: qué partido (next) y qué slot (team1|team2) recibe al ganador
+// ---------------------------------------------------------------------------
+const ADVANCE_MAP = {
+  // Ronda de 32 → Octavos (R16)
+  'r32_L1': { next: 'r16_L1', slot: 'team1' },
+  'r32_L2': { next: 'r16_L1', slot: 'team2' },
+  'r32_L3': { next: 'r16_L2', slot: 'team1' },
+  'r32_L4': { next: 'r16_L2', slot: 'team2' },
+  'r32_L5': { next: 'r16_L3', slot: 'team1' },
+  'r32_L6': { next: 'r16_L3', slot: 'team2' },
+  'r32_L7': { next: 'r16_L4', slot: 'team1' },
+  'r32_L8': { next: 'r16_L4', slot: 'team2' },
+  'r32_R1': { next: 'r16_R1', slot: 'team1' },
+  'r32_R2': { next: 'r16_R1', slot: 'team2' },
+  'r32_R3': { next: 'r16_R2', slot: 'team1' },
+  'r32_R4': { next: 'r16_R2', slot: 'team2' },
+  'r32_R5': { next: 'r16_R3', slot: 'team1' },
+  'r32_R6': { next: 'r16_R3', slot: 'team2' },
+  'r32_R7': { next: 'r16_R4', slot: 'team1' },
+  'r32_R8': { next: 'r16_R4', slot: 'team2' },
+  // Octavos (R16) → Cuartos (QF)
+  'r16_L1': { next: 'qf_L1', slot: 'team1' },
+  'r16_L2': { next: 'qf_L1', slot: 'team2' },
+  'r16_L3': { next: 'qf_L2', slot: 'team1' },
+  'r16_L4': { next: 'qf_L2', slot: 'team2' },
+  'r16_R1': { next: 'qf_R1', slot: 'team1' },
+  'r16_R2': { next: 'qf_R1', slot: 'team2' },
+  'r16_R3': { next: 'qf_R2', slot: 'team1' },
+  'r16_R4': { next: 'qf_R2', slot: 'team2' },
+  // Cuartos (QF) → Semifinales (SF)
+  'qf_L1': { next: 'sf_L', slot: 'team1' },
+  'qf_L2': { next: 'sf_L', slot: 'team2' },
+  'qf_R1': { next: 'sf_R', slot: 'team1' },
+  'qf_R2': { next: 'sf_R', slot: 'team2' },
+  // Semifinales → Final
+  'sf_L': { next: 'final', slot: 'team1' },
+  'sf_R': { next: 'final', slot: 'team2' },
+  // final: no tiene siguiente ronda
+};
+
+// ---------------------------------------------------------------------------
 // LocalStorage keys
 // ---------------------------------------------------------------------------
 const LS_KEYS = {
