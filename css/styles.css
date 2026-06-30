@@ -2607,3 +2607,140 @@ body.page-registro .registro-container { max-width: 640px; padding: 0 1rem 4rem;
 .bracket-center .bracket-round[data-label]::before {
   top: -1.4rem;
 }
+
+/* ===========================================================================
+   31. Bracket compact row — .bk-row namespace (avoids conflict with group .match-row)
+   =========================================================================== */
+
+.bk-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin: 2px 0;
+  min-width: 220px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Variant: final match gets gold border */
+.bk-row--final {
+  border-color: rgba(255, 215, 0, 0.4);
+  box-shadow: 0 0 0 1px rgba(255,215,0,0.15), 0 6px 24px rgba(0,0,0,0.45);
+}
+
+/* Team half */
+.bk-row__team {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Right team half: flag on right, text right-aligned */
+.bk-row__team--right {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+/* Score circle */
+.bk-row__score {
+  min-width: 32px;
+  height: 24px;
+  border-radius: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--accent-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent-gold);
+  flex-shrink: 0;
+  padding: 0 5px;
+  font-family: 'Bebas Neue', sans-serif;
+}
+.bk-row__score--tbd {
+  color: var(--text-muted);
+  border-color: var(--border);
+}
+
+/* Flag */
+.bk-row__flag {
+  font-size: 1.1rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* Info block */
+.bk-row__info {
+  min-width: 0;
+  overflow: hidden;
+}
+.bk-row__name {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-primary);
+}
+.bk-row__owner {
+  display: block;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Winner state */
+.bk-row__team--winner .bk-row__name {
+  font-weight: 700;
+  color: var(--accent-gold);
+}
+
+/* Loser state */
+.bk-row__team--loser {
+  opacity: 0.4;
+}
+
+/* TBD (no team yet) */
+.bk-row__team--tbd .bk-row__name {
+  color: var(--text-muted);
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* Compact slot height */
+.bracket-slot {
+  min-height: 48px;
+}
+
+/* Third place block below final */
+.bracket-third-place {
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+  text-align: center;
+  width: 100%;
+}
+.bracket-third-place__label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+@media (max-width: 767px) {
+  .bk-row { min-width: 180px; }
+  .bk-row__name { font-size: 0.65rem; }
+  .bk-row__flag { font-size: 0.95rem; }
+}

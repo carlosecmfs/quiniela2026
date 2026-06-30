@@ -211,6 +211,19 @@ const FINAL = [{
   played: false,
 }];
 
+// Partido por el tercer puesto
+const THIRD_PLACE = [{
+  id: 'third_place',
+  phase: 'third',
+  group: null,
+  team1: null,
+  team2: null,
+  score1: null,
+  score2: null,
+  date: '2026-07-18',
+  played: false,
+}];
+
 // ---------------------------------------------------------------------------
 // MATCHES — colección completa
 // ---------------------------------------------------------------------------
@@ -221,6 +234,7 @@ const MATCHES = [
   ...QUARTER_FINALS,
   ...SEMI_FINALS,
   ...FINAL,
+  ...THIRD_PLACE,
 ];
 
 // ---------------------------------------------------------------------------

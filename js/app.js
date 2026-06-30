@@ -623,6 +623,79 @@ function getPhaseMatches(phase) {
 }
 
 // ---------------------------------------------------------------------------
+// buildBracketMatchRow — fila horizontal compacta para el bracket
+// [flag] Equipo1 [owner?]  ⚪ score ⚪  [owner?] Equipo2 [flag]
+// ---------------------------------------------------------------------------
+
+function buildBracketMatchRow(m) {
+  const row = document.createElement('div');
+  row.className = 'bk-row';
+
+  const t1Id  = m?.team1 || null;
+  const t2Id  = m?.team2 || null;
+  const played = m?.played ?? false;
+  const winnerField = m?.winner || null;
+  const s1 = played ? m.score1 : null;
+  const s2 = played ? m.score2 : null;
+  const n1 = Number(s1), n2 = Number(s2);
+  const w1 = played && (winnerField ? winnerField === t1Id : n1 > n2);
+  const w2 = played && (winnerField ? winnerField === t2Id : n2 > n1);
+
+  function teamHalf(teamId, isWinner, isLeft) {
+    const half = document.createElement('div');
+    half.className = 'bk-row__team' + (isLeft ? '' : ' bk-row__team--right');
+
+    if (!teamId) {
+      half.classList.add('bk-row__team--tbd');
+      const globe = document.createElement('span');
+      globe.className = 'bk-row__flag';
+      globe.setAttribute('aria-hidden', 'true');
+      globe.textContent = '🌐';
+      const lbl = document.createElement('div');
+      lbl.className = 'bk-row__info';
+      lbl.innerHTML = `<span class="bk-row__name">Por definir</span>`;
+      if (isLeft) { half.appendChild(globe); half.appendChild(lbl); }
+      else        { half.appendChild(lbl);   half.appendChild(globe); }
+      return half;
+    }
+
+    const team  = getTeam(teamId);
+    if (!team) { half.textContent = teamId; return half; }
+
+    const owner = getTeamOwner(teamId);
+    if (played) half.classList.add(isWinner ? 'bk-row__team--winner' : 'bk-row__team--loser');
+
+    const flag = document.createElement('span');
+    flag.className = 'bk-row__flag';
+    flag.setAttribute('aria-hidden', 'true');
+    flag.textContent = team.flag;
+
+    const info = document.createElement('div');
+    info.className = 'bk-row__info';
+    info.innerHTML = `<span class="bk-row__name">${esc(team.name)}</span>`
+      + (owner ? `<span class="bk-row__owner">${esc(getParticipantName(owner))}</span>` : '');
+
+    if (isLeft) { half.appendChild(flag); half.appendChild(info); }
+    else        { half.appendChild(info); half.appendChild(flag); }
+    return half;
+  }
+
+  const scoreEl = document.createElement('div');
+  scoreEl.className = 'bk-row__score';
+  if (played && s1 !== null && s2 !== null) {
+    scoreEl.textContent = `${s1}-${s2}`;
+  } else {
+    scoreEl.textContent = '?';
+    scoreEl.classList.add('bk-row__score--tbd');
+  }
+
+  row.appendChild(teamHalf(t1Id, w1, true));
+  row.appendChild(scoreEl);
+  row.appendChild(teamHalf(t2Id, w2, false));
+  return row;
+}
+
+// ---------------------------------------------------------------------------
 // 10. renderBracket — vista completa del bracket eliminatorio FIFA 2026
 // Lee partidos directamente de STATE.matches por phase + id pattern.
 // r32: r32_L1..r32_L8 (izq), r32_R1..r32_R8 (der)
@@ -644,7 +717,7 @@ function renderBracket(container) {
   hint.textContent = '← Desliza para ver el bracket completo →';
   container.appendChild(hint);
 
-  // ── Datos por fase y lado ─────────────────────────────────────────────────
+  // ── Datos por fase y lado (LÓGICA IDÉNTICA, sin tocar) ────────────────────
   const byPhaseId = (phase, side) =>
     STATE.matches
       .filter(m => m.phase === phase && m.id.includes(side))
@@ -659,15 +732,9 @@ function renderBracket(container) {
   const sfLeft   = STATE.matches.find(m => m.id === 'sf_L') || null;
   const sfRight  = STATE.matches.find(m => m.id === 'sf_R') || null;
   const finalM   = STATE.matches.find(m => m.phase === 'final') || null;
+  const thirdM   = STATE.matches.find(m => m.phase === 'third') || null;
 
-  // ── Helper: match object → match-box DOM ──────────────────────────────────
-  function toBox(m) {
-    const t1 = m ? (m.team1 || null) : null;
-    const t2 = m ? (m.team2 || null) : null;
-    return buildMatchBox(t1, t2, m || null, true);
-  }
-
-  // ── Helper: build una columna de ronda ───────────────────────────────────
+  // ── Helper: columna de ronda con filas compactas ──────────────────────────
   function buildCol(label, matchObjs, roundKey) {
     const round = document.createElement('div');
     round.className = 'bracket-round';
@@ -679,7 +746,7 @@ function renderBracket(container) {
     (matchObjs.length ? matchObjs : [null]).forEach(m => {
       const slot = document.createElement('div');
       slot.className = 'bracket-slot';
-      slot.appendChild(toBox(m));
+      slot.appendChild(buildBracketMatchRow(m));
       wrap.appendChild(slot);
     });
     round.appendChild(wrap);
@@ -722,9 +789,9 @@ function renderBracket(container) {
   finalWrap.className = 'bracket-round__matches';
   const finalSlot = document.createElement('div');
   finalSlot.className = 'bracket-slot';
-  const finalBox = toBox(finalM);
-  finalBox.classList.add('match-box--final');
-  finalSlot.appendChild(finalBox);
+  const finalRow = buildBracketMatchRow(finalM);
+  finalRow.classList.add('bk-row--final');
+  finalSlot.appendChild(finalRow);
   finalWrap.appendChild(finalSlot);
   finalRound.appendChild(finalWrap);
   center.appendChild(finalRound);
@@ -741,6 +808,17 @@ function renderBracket(container) {
     champEl.style.color = 'var(--text-muted)';
   }
   center.appendChild(champEl);
+
+  // Tercer puesto (debajo del bloque central)
+  const thirdBlock = document.createElement('div');
+  thirdBlock.className = 'bracket-third-place';
+  const thirdLabel = document.createElement('div');
+  thirdLabel.className = 'bracket-third-place__label';
+  thirdLabel.textContent = 'PARTIDO POR EL TERCER PUESTO';
+  thirdBlock.appendChild(thirdLabel);
+  thirdBlock.appendChild(buildBracketMatchRow(thirdM));
+  center.appendChild(thirdBlock);
+
   bracketContainer.appendChild(center);
 
   // ── LADO DERECHO (columnas en orden inverso con flex-direction: row-reverse) ─
