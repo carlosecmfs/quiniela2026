@@ -147,70 +147,64 @@ GROUP_IDS.forEach(gid => {
 
 // ---------------------------------------------------------------------------
 // MATCHES — Fase Eliminatoria
-// Los slots se rellenan con TBD hasta que los grupos terminen.
-// id convenio: R32-XX, R16-XX, QF-XX, SF-XX, F-01
+// id convenio: r32_L1..r32_L8 / r32_R1..r32_R8, r16_L*, r16_R*, qf_L*, qf_R*, sf_L, sf_R, final
 // ---------------------------------------------------------------------------
 
-// Ronda de 32 (32 equipos, 16 partidos)
-// Los mejores 2 de cada grupo + los 8 mejores terceros clasificados
-const ROUND_OF_32 = Array.from({ length: 16 }, (_, i) => ({
-  id: `R32-${String(i + 1).padStart(2, '0')}`,
-  phase: 'round32',
-  group: null,
-  team1: 'TBD',
-  team2: 'TBD',
-  score1: null,
-  score2: null,
-  date: '2026-07-04',
-  played: false,
-}));
+// Ronda de 32 — cruces oficiales FIFA 2026
+const ROUND_OF_32 = [
+  // LADO IZQUIERDO
+  { id: 'r32_L1', phase: 'r32', group: null, team1: 'RSA', team2: 'CAN', score1: null, score2: null, date: '2026-06-27', played: false },
+  { id: 'r32_L2', phase: 'r32', group: null, team1: 'NED', team2: 'MAR', score1: null, score2: null, date: '2026-06-27', played: false },
+  { id: 'r32_L3', phase: 'r32', group: null, team1: 'GER', team2: 'PAR', score1: null, score2: null, date: '2026-06-28', played: false },
+  { id: 'r32_L4', phase: 'r32', group: null, team1: 'FRA', team2: 'SWE', score1: null, score2: null, date: '2026-06-28', played: false },
+  { id: 'r32_L5', phase: 'r32', group: null, team1: 'BEL', team2: 'SEN', score1: null, score2: null, date: '2026-06-29', played: false },
+  { id: 'r32_L6', phase: 'r32', group: null, team1: 'USA', team2: 'BIH', score1: null, score2: null, date: '2026-06-29', played: false },
+  { id: 'r32_L7', phase: 'r32', group: null, team1: 'ESP', team2: 'AUT', score1: null, score2: null, date: '2026-06-30', played: false },
+  { id: 'r32_L8', phase: 'r32', group: null, team1: 'POR', team2: 'CRO', score1: null, score2: null, date: '2026-06-30', played: false },
+  // LADO DERECHO
+  { id: 'r32_R1', phase: 'r32', group: null, team1: 'BRA', team2: 'JPN', score1: null, score2: null, date: '2026-06-27', played: false },
+  { id: 'r32_R2', phase: 'r32', group: null, team1: 'IVK', team2: 'NOR', score1: null, score2: null, date: '2026-06-27', played: false },
+  { id: 'r32_R3', phase: 'r32', group: null, team1: 'MEX', team2: 'ECU', score1: null, score2: null, date: '2026-06-28', played: false },
+  { id: 'r32_R4', phase: 'r32', group: null, team1: 'ENG', team2: 'RDC', score1: null, score2: null, date: '2026-06-28', played: false },
+  { id: 'r32_R5', phase: 'r32', group: null, team1: 'SUI', team2: 'ALG', score1: null, score2: null, date: '2026-06-29', played: false },
+  { id: 'r32_R6', phase: 'r32', group: null, team1: 'COL', team2: 'GHA', score1: null, score2: null, date: '2026-06-29', played: false },
+  { id: 'r32_R7', phase: 'r32', group: null, team1: 'AUS', team2: 'EGY', score1: null, score2: null, date: '2026-06-30', played: false },
+  { id: 'r32_R8', phase: 'r32', group: null, team1: 'ARG', team2: 'CPV', score1: null, score2: null, date: '2026-06-30', played: false },
+];
 
-// Octavos de final (16 equipos, 8 partidos)
-const ROUND_OF_16 = Array.from({ length: 8 }, (_, i) => ({
-  id: `R16-${String(i + 1).padStart(2, '0')}`,
-  phase: 'round16',
-  group: null,
-  team1: 'TBD',
-  team2: 'TBD',
-  score1: null,
-  score2: null,
-  date: '2026-07-11',
-  played: false,
-}));
+// Octavos de final — 8 partidos
+const ROUND_OF_16 = [
+  { id: 'r16_L1', phase: 'r16', group: null, team1: null, team2: null, score1: null, score2: null, date: '2026-07-03', played: false },
+  { id: 'r16_L2', phase: 'r16', group: null, team1: null, team2: null, score1: null, score2: null, date: '2026-07-03', played: false },
+  { id: 'r16_L3', phase: 'r16', group: null, team1: null, team2: null, score1: null, score2: null, date: '2026-07-04', played: false },
+  { id: 'r16_L4', phase: 'r16', group: null, team1: null, team2: null, score1: null, score2: null, date: '2026-07-04', played: false },
+  { id: 'r16_R1', phase: 'r16', group: null, team1: null, team2: null, score1: null, score2: null, date: '2026-07-05', played: false },
+  { id: 'r16_R2', phase: 'r16', group: null, team1: null, team2: null, score1: null, score2: null, date: '2026-07-05', played: false },
+  { id: 'r16_R3', phase: 'r16', group: null, team1: null, team2: null, score1: null, score2: null, date: '2026-07-06', played: false },
+  { id: 'r16_R4', phase: 'r16', group: null, team1: null, team2: null, score1: null, score2: null, date: '2026-07-06', played: false },
+];
 
-// Cuartos de final (8 equipos, 4 partidos)
-const QUARTER_FINALS = Array.from({ length: 4 }, (_, i) => ({
-  id: `QF-${String(i + 1).padStart(2, '0')}`,
-  phase: 'quarterfinals',
-  group: null,
-  team1: 'TBD',
-  team2: 'TBD',
-  score1: null,
-  score2: null,
-  date: '2026-07-17',
-  played: false,
-}));
+// Cuartos de final — 4 partidos
+const QUARTER_FINALS = [
+  { id: 'qf_L1', phase: 'qf', group: null, team1: null, team2: null, score1: null, score2: null, date: '2026-07-10', played: false },
+  { id: 'qf_L2', phase: 'qf', group: null, team1: null, team2: null, score1: null, score2: null, date: '2026-07-10', played: false },
+  { id: 'qf_R1', phase: 'qf', group: null, team1: null, team2: null, score1: null, score2: null, date: '2026-07-11', played: false },
+  { id: 'qf_R2', phase: 'qf', group: null, team1: null, team2: null, score1: null, score2: null, date: '2026-07-11', played: false },
+];
 
-// Semifinales (4 equipos, 2 partidos)
-const SEMI_FINALS = Array.from({ length: 2 }, (_, i) => ({
-  id: `SF-${String(i + 1).padStart(2, '0')}`,
-  phase: 'semifinals',
-  group: null,
-  team1: 'TBD',
-  team2: 'TBD',
-  score1: null,
-  score2: null,
-  date: '2026-07-21',
-  played: false,
-}));
+// Semifinales — 2 partidos
+const SEMI_FINALS = [
+  { id: 'sf_L', phase: 'sf', group: null, team1: null, team2: null, score1: null, score2: null, date: '2026-07-14', played: false },
+  { id: 'sf_R', phase: 'sf', group: null, team1: null, team2: null, score1: null, score2: null, date: '2026-07-15', played: false },
+];
 
 // Final
 const FINAL = [{
-  id: 'F-01',
+  id: 'final',
   phase: 'final',
   group: null,
-  team1: 'TBD',
-  team2: 'TBD',
+  team1: null,
+  team2: null,
   score1: null,
   score2: null,
   date: '2026-07-19',
@@ -233,12 +227,12 @@ const MATCHES = [
 // PHASES metadata
 // ---------------------------------------------------------------------------
 const PHASES = [
-  { id: 'groups',       name: 'Fase de Grupos',     matchCount: 72 },
-  { id: 'round32',      name: 'Ronda de 32',         matchCount: 16 },
-  { id: 'round16',      name: 'Octavos de Final',    matchCount: 8  },
-  { id: 'quarterfinals',name: 'Cuartos de Final',    matchCount: 4  },
-  { id: 'semifinals',   name: 'Semifinales',         matchCount: 2  },
-  { id: 'final',        name: 'Final',               matchCount: 1  },
+  { id: 'groups', name: 'Fase de Grupos',   matchCount: 72 },
+  { id: 'r32',    name: 'Ronda de 32',      matchCount: 16 },
+  { id: 'r16',    name: 'Octavos de Final', matchCount: 8  },
+  { id: 'qf',     name: 'Cuartos de Final', matchCount: 4  },
+  { id: 'sf',     name: 'Semifinales',      matchCount: 2  },
+  { id: 'final',  name: 'Final',            matchCount: 1  },
 ];
 
 // ---------------------------------------------------------------------------

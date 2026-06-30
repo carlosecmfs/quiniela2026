@@ -327,11 +327,11 @@ function buildEliminatoriasTab() {
   );
 
   const PHASES = [
-    { phase: 'round32',        label: 'Ronda de 32',     total: 16 },
-    { phase: 'round16',        label: 'Octavos de Final', total: 8  },
-    { phase: 'quarterfinals',  label: 'Cuartos de Final', total: 4  },
-    { phase: 'semifinals',     label: 'Semifinales',      total: 2  },
-    { phase: 'final',          label: 'Final',            total: 1  },
+    { phase: 'r32',   label: 'Ronda de 32',     total: 16 },
+    { phase: 'r16',   label: 'Octavos de Final', total: 8  },
+    { phase: 'qf',    label: 'Cuartos de Final', total: 4  },
+    { phase: 'sf',    label: 'Semifinales',      total: 2  },
+    { phase: 'final', label: 'Final',            total: 1  },
   ];
 
   const accordion = document.createElement('div');
@@ -580,11 +580,11 @@ function calcParticipantPoints(participant) {
 
     const inPhase = phase =>
       STATE.matches.some(m => m.phase === phase && (m.team1 === teamId || m.team2 === teamId));
-    if (inPhase('round32'))       pts += 2;
-    if (inPhase('round16'))       pts += 2;
-    if (inPhase('quarterfinals')) pts += 2;
-    if (inPhase('semifinals'))    pts += 5;
-    if (inPhase('final'))         pts += 10;
+    if (inPhase('r32'))   pts += 2;
+    if (inPhase('r16'))   pts += 2;
+    if (inPhase('qf'))    pts += 2;
+    if (inPhase('sf'))    pts += 5;
+    if (inPhase('final')) pts += 10;
 
     const finalM = STATE.matches.find(m => m.phase === 'final');
     if (finalM?.played) {

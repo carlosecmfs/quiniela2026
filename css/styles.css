@@ -2504,6 +2504,7 @@ body.page-registro .registro-container { max-width: 640px; padding: 0 1rem 4rem;
    29. KO winner selector (admin panel)
    =========================================================================== */
 
+
 .ko-winner-wrap {
   margin-top: 6px;
   display: flex;
@@ -2531,4 +2532,78 @@ body.page-registro .registro-container { max-width: 640px; padding: 0 1rem 4rem;
 .ko-winner-select:focus {
   outline: none;
   box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.25);
+}
+
+/* ===========================================================================
+   30. Bracket rediseño — cruces oficiales FIFA 2026
+   =========================================================================== */
+
+/* Round label via data-label attribute (shown above each column) */
+.bracket-round {
+  position: relative;
+}
+.bracket-round[data-label] {
+  margin-top: 2rem;
+}
+.bracket-round[data-label]::before {
+  content: attr(data-label);
+  position: absolute;
+  top: -1.5rem;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.78rem;
+  color: var(--accent-green);
+  letter-spacing: 1.5px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Hide legacy label div when data-label is set */
+.bracket-round[data-label] .bracket-round__label {
+  display: none;
+}
+
+/* Center container: vertically align with sides */
+.bracket-container {
+  align-items: center;
+}
+
+/* Center column: trophy · final · champion */
+.bracket-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 210px;
+  padding: 0 8px;
+  flex-shrink: 0;
+}
+
+.bracket-trophy {
+  font-size: 3rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 14px rgba(255, 215, 0, 0.55));
+  animation: shimmer 2.5s ease-in-out infinite;
+  text-align: center;
+}
+
+.bracket-champion {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.12em;
+  color: var(--accent-gold);
+  text-align: center;
+  min-height: 1.6rem;
+  text-shadow: 0 0 10px var(--shadow-gold);
+}
+
+/* Final round inside center — no margin-top override */
+.bracket-center .bracket-round[data-label] {
+  margin-top: 0;
+}
+.bracket-center .bracket-round[data-label]::before {
+  top: -1.4rem;
 }

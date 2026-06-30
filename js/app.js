@@ -1,5 +1,5 @@
 (function() {
-  const DATA_VERSION = "2026-oficial-v3";
+  const DATA_VERSION = "2026-oficial-v4";
   const stored = localStorage.getItem("qm2026_version");
   if (stored !== DATA_VERSION) {
     localStorage.removeItem("qm2026_matches");
@@ -102,7 +102,7 @@ function getTeamStatus(teamId) {
       || (Number(finalM.score1) > Number(finalM.score2) ? finalM.team1 : finalM.team2);
     if (champ === teamId) return 'champion';
   }
-  const koPhases = ['round32', 'round16', 'quarterfinals', 'semifinals', 'final'];
+  const koPhases = ['r32', 'r16', 'qf', 'sf', 'final'];
   const lost = STATE.matches.find(m =>
     koPhases.includes(m.phase) && m.played &&
     (m.team1 === teamId || m.team2 === teamId) &&
@@ -132,11 +132,11 @@ function calcTeamPts(teamId) {
     });
   const inPhase = ph =>
     STATE.matches.some(m => m.phase === ph && (m.team1 === teamId || m.team2 === teamId));
-  if (inPhase('round32'))       pts += 2;
-  if (inPhase('round16'))       pts += 2;
-  if (inPhase('quarterfinals')) pts += 2;
-  if (inPhase('semifinals'))    pts += 5;
-  if (inPhase('final'))         pts += 10;
+  if (inPhase('r32'))   pts += 2;
+  if (inPhase('r16'))   pts += 2;
+  if (inPhase('qf'))    pts += 2;
+  if (inPhase('sf'))    pts += 5;
+  if (inPhase('final')) pts += 10;
   const fm = STATE.matches.find(m => m.phase === 'final' && m.played);
   if (fm) {
     const champ = fm.winner || (Number(fm.score1) > Number(fm.score2) ? fm.team1 : fm.team2);
@@ -506,49 +506,6 @@ function buildMatchList(matches) {
   return wrap;
 }
 
-// =============================================================================
-// BRACKET — Round of 32 crossing definitions
-// Each entry: [team1Source, team2Source]  where source = { group, pos }
-// pos is 0-indexed: 0 = 1st place, 1 = 2nd place, 2 = 3rd place (best 3rds)
-// Left side  → groups A–F  →  R32 matches index 0–7  (R32-01…R32-08)
-// Right side → groups G–L  →  R32 matches index 8–15 (R32-09…R32-16)
-// =============================================================================
-
-const R32_CROSSINGS = {
-  left: [
-    [{ group:'A', pos:0 }, { group:'B', pos:1 }],  // 1A vs 2B
-    [{ group:'C', pos:0 }, { group:'A', pos:1 }],  // 1C vs 2A
-    [{ group:'D', pos:0 }, { group:'E', pos:1 }],  // 1D vs 2E
-    [{ group:'F', pos:0 }, { group:'D', pos:1 }],  // 1F vs 2D
-    [{ group:'B', pos:0 }, { group:'C', pos:1 }],  // 1B vs 2C
-    [{ group:'E', pos:0 }, { group:'F', pos:1 }],  // 1E vs 2F
-    [{ group:'A', pos:2 }, { group:'B', pos:2 }],  // 3A vs 3B (best 3rds)
-    [{ group:'C', pos:2 }, { group:'D', pos:2 }],  // 3C vs 3D (best 3rds)
-  ],
-  right: [
-    [{ group:'G', pos:0 }, { group:'H', pos:1 }],  // 1G vs 2H
-    [{ group:'I', pos:0 }, { group:'G', pos:1 }],  // 1I vs 2G
-    [{ group:'J', pos:0 }, { group:'K', pos:1 }],  // 1J vs 2K
-    [{ group:'L', pos:0 }, { group:'J', pos:1 }],  // 1L vs 2J
-    [{ group:'H', pos:0 }, { group:'I', pos:1 }],  // 1H vs 2I
-    [{ group:'K', pos:0 }, { group:'L', pos:1 }],  // 1K vs 2L
-    [{ group:'E', pos:2 }, { group:'F', pos:2 }],  // 3E vs 3F (best 3rds)
-    [{ group:'G', pos:2 }, { group:'H', pos:2 }],  // 3G vs 3H (best 3rds)
-  ],
-};
-
-// ---------------------------------------------------------------------------
-// getBracketTeam — resuelve el equipo de un slot de grupo (o devuelve null)
-// ---------------------------------------------------------------------------
-
-function getBracketTeam(slotDef) {
-  if (!slotDef) return null;
-  const status = getGroupStatus(slotDef.group);
-  if (status === 'pending') return null;  // grupo sin partidos → TBD
-  const st = calcGroupStandings(slotDef.group);
-  return st[slotDef.pos]?.id || null;
-}
-
 // ---------------------------------------------------------------------------
 // buildTeamCardEl — construye un .team-card para usar dentro del bracket
 // ---------------------------------------------------------------------------
@@ -666,11 +623,13 @@ function getPhaseMatches(phase) {
 }
 
 // ---------------------------------------------------------------------------
-// 10. renderBracket — vista completa del bracket eliminatorio
+// 10. renderBracket — vista completa del bracket eliminatorio FIFA 2026
+// Lee partidos directamente de STATE.matches por phase + id pattern.
+// r32: r32_L1..r32_L8 (izq), r32_R1..r32_R8 (der)
+// r16: r16_L* (izq), r16_R* (der) | qf: qf_L* / qf_R* | sf: sf_L / sf_R
 // ---------------------------------------------------------------------------
 
 function renderBracket(container) {
-  // Section header
   const header = document.createElement('div');
   header.innerHTML = `
     <h2 class="section-title">Bracket Eliminatorio</h2>
@@ -680,26 +639,54 @@ function renderBracket(container) {
   `;
   container.appendChild(header);
 
-  // Info note while groups are pending
-  const allGroupsDone = GROUP_IDS.every(g => getGroupStatus(g) === 'finished');
-  if (!allGroupsDone) {
-    const note = document.createElement('p');
-    note.className = 'bracket-note';
-    note.innerHTML = `
-      <span>ℹ️</span>
-      Los cruces se actualizarán automáticamente conforme se registren
-      resultados de la fase de grupos.
-    `;
-    container.appendChild(note);
-  }
-
-  // Scroll hint (mobile)
   const hint = document.createElement('div');
   hint.className = 'bracket-scroll-hint';
   hint.textContent = '← Desliza para ver el bracket completo →';
   container.appendChild(hint);
 
-  // ── Wrapper ────────────────────────────────────────────────────────────────
+  // ── Datos por fase y lado ─────────────────────────────────────────────────
+  const byPhaseId = (phase, side) =>
+    STATE.matches
+      .filter(m => m.phase === phase && m.id.includes(side))
+      .sort((a, b) => a.id.localeCompare(b.id));
+
+  const r32Left  = byPhaseId('r32', '_L');
+  const r32Right = byPhaseId('r32', '_R');
+  const r16Left  = byPhaseId('r16', '_L');
+  const r16Right = byPhaseId('r16', '_R');
+  const qfLeft   = byPhaseId('qf',  '_L');
+  const qfRight  = byPhaseId('qf',  '_R');
+  const sfLeft   = STATE.matches.find(m => m.id === 'sf_L') || null;
+  const sfRight  = STATE.matches.find(m => m.id === 'sf_R') || null;
+  const finalM   = STATE.matches.find(m => m.phase === 'final') || null;
+
+  // ── Helper: match object → match-box DOM ──────────────────────────────────
+  function toBox(m) {
+    const t1 = m ? (m.team1 || null) : null;
+    const t2 = m ? (m.team2 || null) : null;
+    return buildMatchBox(t1, t2, m || null, true);
+  }
+
+  // ── Helper: build una columna de ronda ───────────────────────────────────
+  function buildCol(label, matchObjs, roundKey) {
+    const round = document.createElement('div');
+    round.className = 'bracket-round';
+    round.dataset.round = roundKey;
+    round.dataset.label = label;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'bracket-round__matches';
+    (matchObjs.length ? matchObjs : [null]).forEach(m => {
+      const slot = document.createElement('div');
+      slot.className = 'bracket-slot';
+      slot.appendChild(toBox(m));
+      wrap.appendChild(slot);
+    });
+    round.appendChild(wrap);
+    return round;
+  }
+
+  // ── Contenedor principal ──────────────────────────────────────────────────
   const wrapper = document.createElement('div');
   wrapper.className = 'bracket-wrapper';
 
@@ -708,161 +695,61 @@ function renderBracket(container) {
   wrapper.appendChild(bracketContainer);
   container.appendChild(wrapper);
 
-  // ── Phase data ─────────────────────────────────────────────────────────────
-  const r32All  = getPhaseMatches('round32');        // 16 matches
-  const r16All  = getPhaseMatches('round16');        // 8 matches
-  const qfAll   = getPhaseMatches('quarterfinals');  // 4 matches
-  const sfAll   = getPhaseMatches('semifinals');     // 2 matches
-  const finalM  = getPhaseMatches('final')[0];       // 1 match
-
-  // R32 left = indices 0-7, right = 8-15
-  const r32Left  = r32All.slice(0, 8);
-  const r32Right = r32All.slice(8, 16);
-
-  // R16 left = 0-3, right = 4-7
-  const r16Left  = r16All.slice(0, 4);
-  const r16Right = r16All.slice(4, 8);
-
-  // QF left = 0-1, right = 2-3
-  const qfLeft  = qfAll.slice(0, 2);
-  const qfRight = qfAll.slice(2, 4);
-
-  // ── Left side ──────────────────────────────────────────────────────────────
+  // ── LADO IZQUIERDO ────────────────────────────────────────────────────────
   const leftSide = document.createElement('div');
   leftSide.className = 'bracket-side bracket-side--left';
-
-  // R32 left (8 matches)
-  const r32LeftBoxes = r32Left.map((m, i) => {
-    const crossing = R32_CROSSINGS.left[i];
-    const t1 = getBracketTeam(crossing[0]) || m.team1;
-    const t2 = getBracketTeam(crossing[1]) || m.team2;
-    return buildMatchBox(
-      t1 === 'TBD' ? null : t1,
-      t2 === 'TBD' ? null : t2,
-      m, true
-    );
-  });
-  leftSide.appendChild(buildBracketRound('Ronda de 32', r32LeftBoxes, 'r32-left'));
-
-  // R16 left (4 matches)
-  const r16LeftBoxes = r16Left.map(m =>
-    buildMatchBox(
-      m.team1 === 'TBD' ? null : m.team1,
-      m.team2 === 'TBD' ? null : m.team2,
-      m, true
-    )
-  );
-  leftSide.appendChild(buildBracketRound('Octavos', r16LeftBoxes, 'r16-left'));
-
-  // QF left (2 matches)
-  const qfLeftBoxes = qfLeft.map(m =>
-    buildMatchBox(
-      m.team1 === 'TBD' ? null : m.team1,
-      m.team2 === 'TBD' ? null : m.team2,
-      m, true
-    )
-  );
-  leftSide.appendChild(buildBracketRound('Cuartos', qfLeftBoxes, 'qf-left'));
-
-  // SF left (1 match)
-  const sfLeftM = sfAll[0];
-  const sfLeftBox = buildMatchBox(
-    sfLeftM?.team1 === 'TBD' ? null : sfLeftM?.team1,
-    sfLeftM?.team2 === 'TBD' ? null : sfLeftM?.team2,
-    sfLeftM, true
-  );
-  leftSide.appendChild(buildBracketRound('Semifinal', [sfLeftBox], 'sf-left'));
-
+  leftSide.appendChild(buildCol('RONDA DE 32', r32Left,  'r32-left'));
+  leftSide.appendChild(buildCol('OCTAVOS',     r16Left,  'r16-left'));
+  leftSide.appendChild(buildCol('CUARTOS',     qfLeft,   'qf-left'));
+  leftSide.appendChild(buildCol('SEMIFINAL',   sfLeft ? [sfLeft] : [], 'sf-left'));
   bracketContainer.appendChild(leftSide);
 
-  // ── CENTER — Final ──────────────────────────────────────────────────────────
-  const finalCenter = document.createElement('div');
-  finalCenter.className = 'bracket-final';
-
-  const finalLabel = document.createElement('div');
-  finalLabel.className = 'bracket-round__label';
-  finalLabel.textContent = 'FINAL';
-  finalCenter.appendChild(finalLabel);
-
-  const finalBox = buildMatchBox(
-    finalM?.team1 === 'TBD' ? null : finalM?.team1,
-    finalM?.team2 === 'TBD' ? null : finalM?.team2,
-    finalM, true
-  );
-  finalBox.classList.add('match-box--final');
-  finalCenter.appendChild(finalBox);
+  // ── CENTRO — Final ────────────────────────────────────────────────────────
+  const center = document.createElement('div');
+  center.className = 'bracket-center';
 
   const trophy = document.createElement('div');
-  trophy.className = 'trophy-display';
+  trophy.className = 'bracket-trophy';
   trophy.textContent = '🏆';
   trophy.setAttribute('aria-hidden', 'true');
-  finalCenter.appendChild(trophy);
+  center.appendChild(trophy);
 
-  // Champion display — show winner name if Final is played
+  const finalRound = document.createElement('div');
+  finalRound.className = 'bracket-round';
+  finalRound.dataset.round = 'final';
+  finalRound.dataset.label = 'FINAL';
+  const finalWrap = document.createElement('div');
+  finalWrap.className = 'bracket-round__matches';
+  const finalSlot = document.createElement('div');
+  finalSlot.className = 'bracket-slot';
+  const finalBox = toBox(finalM);
+  finalBox.classList.add('match-box--final');
+  finalSlot.appendChild(finalBox);
+  finalWrap.appendChild(finalSlot);
+  finalRound.appendChild(finalWrap);
+  center.appendChild(finalRound);
+
   const champEl = document.createElement('div');
-  champEl.className = 'champion-display';
+  champEl.className = 'bracket-champion';
   if (finalM?.played) {
-    const winId = Number(finalM.score1) >= Number(finalM.score2)
-      ? finalM.team1
-      : finalM.team2;
-    const winTeam = getTeam(winId);
-    champEl.textContent = winTeam
-      ? `${winTeam.flag} ${winTeam.name}`
-      : 'CAMPEÓN';
+    const winId = finalM.winner
+      || (Number(finalM.score1) >= Number(finalM.score2) ? finalM.team1 : finalM.team2);
+    const winTeam = winId ? getTeam(winId) : null;
+    champEl.textContent = winTeam ? `${winTeam.flag} ${winTeam.name}` : 'CAMPEÓN';
   } else {
     champEl.textContent = 'CAMPEÓN';
     champEl.style.color = 'var(--text-muted)';
   }
-  finalCenter.appendChild(champEl);
+  center.appendChild(champEl);
+  bracketContainer.appendChild(center);
 
-  bracketContainer.appendChild(finalCenter);
-
-  // ── Right side ─────────────────────────────────────────────────────────────
+  // ── LADO DERECHO (columnas en orden inverso con flex-direction: row-reverse) ─
   const rightSide = document.createElement('div');
   rightSide.className = 'bracket-side bracket-side--right';
-
-  // SF right (1 match) — leftmost column of right side (visually outermost)
-  const sfRightM = sfAll[1];
-  const sfRightBox = buildMatchBox(
-    sfRightM?.team1 === 'TBD' ? null : sfRightM?.team1,
-    sfRightM?.team2 === 'TBD' ? null : sfRightM?.team2,
-    sfRightM, true
-  );
-  rightSide.appendChild(buildBracketRound('Semifinal', [sfRightBox], 'sf-right'));
-
-  // QF right (2 matches)
-  const qfRightBoxes = qfRight.map(m =>
-    buildMatchBox(
-      m.team1 === 'TBD' ? null : m.team1,
-      m.team2 === 'TBD' ? null : m.team2,
-      m, true
-    )
-  );
-  rightSide.appendChild(buildBracketRound('Cuartos', qfRightBoxes, 'qf-right'));
-
-  // R16 right (4 matches)
-  const r16RightBoxes = r16Right.map(m =>
-    buildMatchBox(
-      m.team1 === 'TBD' ? null : m.team1,
-      m.team2 === 'TBD' ? null : m.team2,
-      m, true
-    )
-  );
-  rightSide.appendChild(buildBracketRound('Octavos', r16RightBoxes, 'r16-right'));
-
-  // R32 right (8 matches)
-  const r32RightBoxes = r32Right.map((m, i) => {
-    const crossing = R32_CROSSINGS.right[i];
-    const t1 = getBracketTeam(crossing[0]) || m.team1;
-    const t2 = getBracketTeam(crossing[1]) || m.team2;
-    return buildMatchBox(
-      t1 === 'TBD' ? null : t1,
-      t2 === 'TBD' ? null : t2,
-      m, true
-    );
-  });
-  rightSide.appendChild(buildBracketRound('Ronda de 32', r32RightBoxes, 'r32-right'));
-
+  rightSide.appendChild(buildCol('SEMIFINAL',   sfRight ? [sfRight] : [], 'sf-right'));
+  rightSide.appendChild(buildCol('CUARTOS',     qfRight,  'qf-right'));
+  rightSide.appendChild(buildCol('OCTAVOS',     r16Right, 'r16-right'));
+  rightSide.appendChild(buildCol('RONDA DE 32', r32Right, 'r32-right'));
   bracketContainer.appendChild(rightSide);
 }
 

@@ -17,65 +17,37 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // ---------------------------------------------------------------------------
-// Seed matches collection on first ever load (collection is empty).
-// If Grupo B still has Italy (stale data), wipes and reinitializes.
+// Seed / reinit matches collection.
+// Si existen docs con phase='r32' y id con prefijo 'r32_' → datos correctos.
+// Cualquier otro caso (datos viejos o colección vacía) → borrar todo y reinit.
 // ---------------------------------------------------------------------------
 async function fbInitMatches(matches) {
-  console.log('📝 Verificando matches en Firestore...');
-  const snap = await db.collection("matches").limit(1).get();
-  console.log('📊 Documentos existentes:', snap.size);
-  if (!snap.empty) {
-    let forceReinit = false;
+  console.log('📝 Verificando esquema de matches en Firestore...');
+  const snap = await db.collection("matches")
+    .where("phase", "==", "r32").limit(1).get();
 
-    const italySnap = await db.collection("matches")
-      .where("group", "==", "B")
-      .where("team1", "==", "ITA")
-      .limit(1).get();
-    if (!italySnap.empty) forceReinit = true;
+  if (!snap.empty && snap.docs[0].id.startsWith('r32_')) {
+    console.log('✅ Matches ya tienen el esquema correcto (r32_L/R)');
+    return;
+  }
 
-    if (!forceReinit) {
-      const italySnap2 = await db.collection("matches")
-        .where("group", "==", "B")
-        .where("team2", "==", "ITA")
-        .limit(1).get();
-      if (!italySnap2.empty) forceReinit = true;
-    }
-
-    if (!forceReinit) {
-      const checkUkraine = await db.collection("matches")
-        .where("group", "==", "F")
-        .where("team1", "==", "UKR")
-        .limit(1).get();
-      if (!checkUkraine.empty) forceReinit = true;
-    }
-
-    if (!forceReinit) {
-      const checkUkraine2 = await db.collection("matches")
-        .where("group", "==", "F")
-        .where("team2", "==", "UKR")
-        .limit(1).get();
-      if (!checkUkraine2.empty) forceReinit = true;
-    }
-
-    if (!forceReinit) {
-      console.log('✅ Matches ya existen con datos correctos');
-      return;
-    }
-
-    console.log('🔄 Detectado datos viejos (Italia/Ucrania), reinicializando...');
-    const allSnap = await db.collection("matches").get();
+  // Datos no encontrados o IDs con formato viejo — reinicializar todo
+  console.log('🔄 Reinicializando Firestore con cruces oficiales FIFA...');
+  const allSnap = await db.collection("matches").get();
+  if (!allSnap.empty) {
     const delBatch = db.batch();
     allSnap.docs.forEach(d => delBatch.delete(d.ref));
     await delBatch.commit();
+    console.log(`🗑️ Eliminados ${allSnap.size} documentos con esquema viejo`);
   }
-  console.log('⚡ Inicializando', matches.length, 'matches con datos correctos...');
+
   const batch = db.batch();
   matches.forEach(m => {
     const ref = db.collection("matches").doc(String(m.id));
     batch.set(ref, m);
   });
   await batch.commit();
-  console.log('🎉 Firestore actualizado con grupos oficiales');
+  console.log('✅ Firestore reinicializado con cruces oficiales');
 }
 
 // ---------------------------------------------------------------------------
